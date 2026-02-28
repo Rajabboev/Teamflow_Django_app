@@ -1,0 +1,10 @@
+{% extends "core/base.html" %}
+{% block title %}Delete {{ task.title }} – Teamflow{% endblock %}
+{% block content %}
+<h1>Delete task</h1>
+<p>Are you sure you want to delete <strong>{{ task.title }}</strong>?</p>
+<form method="post" action="">
+    {% csrf_token %}
+    <p><button type="submit" class="btn btn-danger">Delete</button> <a href="{% url 'core:task_detail' task.pk %}">Cancel</a></p>
+</form>
+{% endblock %}

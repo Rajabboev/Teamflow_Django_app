@@ -1,0 +1,102 @@
+{% extends "core/base.html" %}
+{% block title %}Tasks – Teamflow{% endblock %}
+{% block content %}
+<h1 class="h3 mb-4">Tasks</h1>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" action="" class="row g-2 align-items-end">
+            <div class="col-md-2">
+                <label for="id_status" class="form-label small">Status</label>
+                <select name="status" id="id_status" class="form-select form-select-sm">
+                    <option value="">All</option>
+                    <option value="todo" {% if status_filter == "todo" %}selected{% endif %}>To Do</option>
+                    <option value="in_progress" {% if status_filter == "in_progress" %}selected{% endif %}>In Progress</option>
+                    <option value="done" {% if status_filter == "done" %}selected{% endif %}>Done</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="id_priority" class="form-label small">Priority</label>
+                <select name="priority" id="id_priority" class="form-select form-select-sm">
+                    <option value="">All</option>
+                    <option value="low" {% if priority_filter == "low" %}selected{% endif %}>Low</option>
+                    <option value="medium" {% if priority_filter == "medium" %}selected{% endif %}>Medium</option>
+                    <option value="high" {% if priority_filter == "high" %}selected{% endif %}>High</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="id_deadline" class="form-label small">Deadline</label>
+                <select name="deadline" id="id_deadline" class="form-select form-select-sm">
+                    <option value="">All</option>
+                    <option value="overdue" {% if deadline_filter == "overdue" %}selected{% endif %}>Overdue</option>
+                    <option value="upcoming" {% if deadline_filter == "upcoming" %}selected{% endif %}>Upcoming</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+                <a href="{% url 'core:task_list' %}" class="btn btn-outline-secondary btn-sm">Clear</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        {% if tasks %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Task</th>
+                        <th>Team</th>
+                        <th>Status</th>
+                        <th>Priority</th>
+                        <th>Assigned</th>
+                        <th>Deadline</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for task in tasks %}
+                    <tr class="{% if task.deadline and task.deadline < now and task.status != 'done' %}task-row-overdue{% endif %}">
+                        <td><a href="{% url 'core:task_detail' task.pk %}" class="text-decoration-none fw-medium">{{ task.title }}</a></td>
+                        <td>{{ task.team.name }}</td>
+                        <td><span class="badge badge-status-{{ task.status }}">{{ task.get_status_display }}</span></td>
+                        <td><span class="badge badge-priority-{{ task.priority }}">{{ task.get_priority_display }}</span></td>
+                        <td>{{ task.assigned_to.get_username|default:"—" }}</td>
+                        <td>
+                            {% if task.deadline %}
+                                {% if task.deadline < now and task.status != 'done' %}
+                                    <span class="countdown-overdue">Overdue</span>
+                                {% else %}
+                                    {{ task.deadline|date:"M d, Y" }}
+                                {% endif %}
+                            {% else %}—{% endif %}
+                        </td>
+                        <td><a href="{% url 'core:task_detail' task.pk %}" class="btn btn-sm btn-outline-primary">View</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if page_obj %}
+        <nav class="p-3 border-top">
+            <ul class="pagination pagination-sm mb-0">
+                {% if page_obj.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if priority_filter %}&priority={{ priority_filter }}{% endif %}{% if deadline_filter %}&deadline={{ deadline_filter }}{% endif %}">Previous</a></li>
+                {% endif %}
+                <li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+                {% if page_obj.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if priority_filter %}&priority={{ priority_filter }}{% endif %}{% if deadline_filter %}&deadline={{ deadline_filter }}{% endif %}">Next</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+        {% else %}
+        <p class="text-muted p-4 mb-0">No tasks match your filters.</p>
+        {% endif %}
+    </div>
+</div>
+
+<p class="mt-3"><a href="{% url 'core:task_create' %}" class="btn btn-primary">Create task</a></p>
+{% endblock %}

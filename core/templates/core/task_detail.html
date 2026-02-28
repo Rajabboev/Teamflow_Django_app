@@ -1,0 +1,31 @@
+{% extends "core/base.html" %}
+{% block title %}{{ task.title }} – Teamflow{% endblock %}
+{% block content %}
+<h1>{{ task.title }}</h1>
+<p><strong>Team:</strong> <a href="{% url 'core:team_detail' task.team_id %}">{{ task.team.name }}</a></p>
+<p><strong>Status:</strong> {{ task.get_status_display }} | <strong>Priority:</strong> {{ task.get_priority_display }}</p>
+<p><strong>Assigned to:</strong> {{ task.assigned_to.get_username|default:"Unassigned" }}</p>
+{% if task.deadline %}<p><strong>Deadline:</strong> {{ task.deadline|date:"DATETIME_FORMAT" }}</p>{% endif %}
+<p>{{ task.description|default:"No description." }}</p>
+{% if task.tags.all %}<p><strong>Tags:</strong> {% for t in task.tags.all %}<span style="color:{{ t.color }}">{{ t.name }}</span>{% if not forloop.last %}, {% endif %}{% endfor %}</p>{% endif %}
+
+<p>
+    <a href="{% url 'core:task_update' task.pk %}" class="btn">Edit task</a>
+    <a href="{% url 'core:task_delete' task.pk %}" class="btn btn-danger">Delete</a>
+</p>
+
+<h2>Feedback</h2>
+{% if can_give_feedback %}
+<p><a href="{% url 'core:feedback_create' task.pk %}" class="btn">Add feedback</a></p>
+{% endif %}
+{% for fb in task.feedbacks.all %}
+<div style="border:1px solid #ccc; padding:0.75rem; margin-bottom:0.5rem;">
+    <strong>{{ fb.author.get_username }}</strong> – {{ fb.rating }}/5 – {{ fb.created_at|date }}</p>
+    <p>{{ fb.content }}</p>
+</div>
+{% empty %}
+<p>No feedback yet.</p>
+{% endfor %}
+
+<p><a href="{% url 'core:task_list' %}">Back to tasks</a></p>
+{% endblock %}

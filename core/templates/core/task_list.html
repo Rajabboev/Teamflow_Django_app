@@ -1,0 +1,47 @@
+{% extends "core/base.html" %}
+{% block title %}Tasks – Teamflow{% endblock %}
+{% block content %}
+<h1>Tasks</h1>
+<form method="get" action="">
+    <p>
+        <label>Status</label>
+        <select name="status">
+            <option value="">All</option>
+            <option value="todo" {% if status_filter == "todo" %}selected{% endif %}>To Do</option>
+            <option value="in_progress" {% if status_filter == "in_progress" %}selected{% endif %}>In Progress</option>
+            <option value="done" {% if status_filter == "done" %}selected{% endif %}>Done</option>
+        </select>
+        <label>Priority</label>
+        <select name="priority">
+            <option value="">All</option>
+            <option value="low" {% if priority_filter == "low" %}selected{% endif %}>Low</option>
+            <option value="medium" {% if priority_filter == "medium" %}selected{% endif %}>Medium</option>
+            <option value="high" {% if priority_filter == "high" %}selected{% endif %}>High</option>
+        </select>
+        <label>Deadline</label>
+        <select name="deadline">
+            <option value="">All</option>
+            <option value="overdue" {% if deadline_filter == "overdue" %}selected{% endif %}>Overdue</option>
+            <option value="upcoming" {% if deadline_filter == "upcoming" %}selected{% endif %}>Upcoming</option>
+        </select>
+        <button type="submit" class="btn">Filter</button>
+    </p>
+</form>
+{% if tasks %}
+<ul>
+    {% for task in tasks %}
+    <li>
+        <a href="{% url 'core:task_detail' task.pk %}">{{ task.title }}</a>
+        – {{ task.get_status_display }} / {{ task.get_priority_display }} ({{ task.team.name }})
+        {% if task.assigned_to %} → {{ task.assigned_to.get_username }}{% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% if page_obj %}
+<p>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</p>
+{% endif %}
+{% else %}
+<p>No tasks match.</p>
+{% endif %}
+<p><a href="{% url 'core:task_create' %}" class="btn">Create task</a></p>
+{% endblock %}

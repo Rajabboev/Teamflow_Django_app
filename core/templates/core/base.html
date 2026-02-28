@@ -1,0 +1,88 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Teamflow{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'core:dashboard' %}"><i class="bi bi-diagram-3"></i> Teamflow</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'core:dashboard' %}">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'core:team_list' %}">Teams</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'core:task_list' %}">Tasks</a></li>
+                </ul>
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-person-circle"></i> {{ user.get_username }}
+                                {% if user.profile.role == 'team_lead' %}<span class="badge bg-info ms-1">Lead</span>{% endif %}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                <li><a class="dropdown-item" href="{% url 'core:profile' %}">Profile</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'core:logout' %}">Logout</a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'core:login' %}">Login</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'core:register' %}">Register</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid flex-grow-1">
+        <div class="row">
+            {% if user.is_authenticated %}
+            <nav class="col-md-2 d-md-block bg-light sidebar collapse py-3">
+                <div class="position-sticky pt-2">
+                    <ul class="nav flex-column">
+                        <li class="nav-item"><a class="nav-link link-dark" href="{% url 'core:dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                        <li class="nav-item"><a class="nav-link link-dark" href="{% url 'core:team_list' %}"><i class="bi bi-people"></i> Teams</a></li>
+                        <li class="nav-item"><a class="nav-link link-dark" href="{% url 'core:task_list' %}"><i class="bi bi-list-task"></i> Tasks</a></li>
+                        {% if user.profile.role == 'team_lead' %}
+                        <li class="nav-item"><a class="nav-link link-dark" href="{% url 'core:team_create' %}"><i class="bi bi-plus-circle"></i> New team</a></li>
+                        <li class="nav-item"><a class="nav-link link-dark" href="{% url 'core:task_create' %}"><i class="bi bi-plus-square"></i> New task</a></li>
+                        {% endif %}
+                        <li class="nav-item"><a class="nav-link link-dark" href="{% url 'core:profile' %}"><i class="bi bi-person"></i> Profile</a></li>
+                    </ul>
+                </div>
+            </nav>
+            {% endif %}
+            <main class="col-md-10 ms-sm-auto px-4 py-4">
+                {% if messages %}
+                <div class="mb-3">
+                    {% for message in messages %}
+                    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags|default:'info' }}{% endif %} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+
+    <footer class="mt-auto py-2 bg-light text-center text-muted small">
+        &copy; Teamflow
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

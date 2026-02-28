@@ -1,0 +1,11 @@
+{% extends "core/base.html" %}
+{% block title %}{% if object %}Edit team{% else %}Create team{% endif %} – Teamflow{% endblock %}
+{% block content %}
+<h1>{% if object %}Edit team{% else %}Create team{% endif %}</h1>
+<form method="post" action="">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <p><button type="submit" class="btn">Save</button></p>
+</form>
+<p><a href="{% url 'core:team_list' %}">Back to teams</a></p>
+{% endblock %}

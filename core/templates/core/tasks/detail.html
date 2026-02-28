@@ -1,0 +1,82 @@
+{% extends "core/base.html" %}
+{% block title %}{{ task.title }} – Teamflow{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'core:task_list' %}">Tasks</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ task.title }}</li>
+    </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-start mb-3">
+    <h1 class="h3 mb-0">{{ task.title }}</h1>
+    <div>
+        <a href="{% url 'core:task_update' task.pk %}" class="btn btn-outline-primary btn-sm">Edit</a>
+        <a href="{% url 'core:task_delete' task.pk %}" class="btn btn-outline-danger btn-sm">Delete</a>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-3 {% if task.deadline and task.deadline < now and task.status != 'done' %}border-danger{% endif %}">
+    <div class="card-body">
+        <div class="row mb-2">
+            <div class="col-sm-2 text-muted">Team</div>
+            <div class="col-sm-10"><a href="{% url 'core:team_detail' task.team_id %}">{{ task.team.name }}</a></div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-sm-2 text-muted">Status</div>
+            <div class="col-sm-10"><span class="badge badge-status-{{ task.status }}">{{ task.get_status_display }}</span></div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-sm-2 text-muted">Priority</div>
+            <div class="col-sm-10"><span class="badge badge-priority-{{ task.priority }}">{{ task.get_priority_display }}</span></div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-sm-2 text-muted">Assigned to</div>
+            <div class="col-sm-10">{{ task.assigned_to.get_username|default:"Unassigned" }}</div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-sm-2 text-muted">Deadline</div>
+            <div class="col-sm-10">
+                {% if task.deadline %}
+                    {% if task.deadline < now and task.status != 'done' %}
+                        <span class="countdown-overdue"><i class="bi bi-exclamation-circle"></i> {{ task.deadline|date:"M d, Y H:i" }} (Overdue)</span>
+                    {% else %}
+                        {{ task.deadline|date:"M d, Y H:i" }}
+                    {% endif %}
+                {% else %}—{% endif %}
+            </div>
+        </div>
+        {% if task.tags.all %}
+        <div class="row mb-2">
+            <div class="col-sm-2 text-muted">Tags</div>
+            <div class="col-sm-10">{% for t in task.tags.all %}<span class="badge me-1" style="background-color:{{ t.color }}">{{ t.name }}</span>{% endfor %}</div>
+        </div>
+        {% endif %}
+        <div class="row">
+            <div class="col-sm-2 text-muted">Description</div>
+            <div class="col-sm-10">{{ task.description|default:"No description."|linebreaks }}</div>
+        </div>
+    </div>
+</div>
+
+<h5 class="mb-2">Feedback</h5>
+{% if can_give_feedback %}
+<p><a href="{% url 'core:feedback_create' task.pk %}" class="btn btn-sm btn-primary"><i class="bi bi-chat-left-text"></i> Add feedback</a></p>
+{% endif %}
+{% for fb in task.feedbacks.all %}
+<div class="card border-0 shadow-sm mb-2">
+    <div class="card-body py-2">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+            <strong>{{ fb.author.get_username }}</strong>
+            <span class="badge bg-warning text-dark">{{ fb.rating }}/5</span>
+        </div>
+        <p class="mb-0 small text-muted">{{ fb.created_at|date:"M d, Y H:i" }}</p>
+        <p class="mb-0 mt-1">{{ fb.content }}</p>
+    </div>
+</div>
+{% empty %}
+<p class="text-muted">No feedback yet.</p>
+{% endfor %}
+
+<p class="mt-3"><a href="{% url 'core:task_list' %}" class="btn btn-outline-secondary">Back to tasks</a></p>
+{% endblock %}

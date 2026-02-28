@@ -1,0 +1,25 @@
+{% extends "core/base.html" %}
+{% block title %}Profile – Teamflow{% endblock %}
+{% block content %}
+<h1 class="h3 mb-4">Your profile</h1>
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data" action="">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="id_role" class="form-label">Role</label>
+                <select name="role" id="id_role" class="form-select">
+                    <option value="member" {% if form.role.value == 'member' %}selected{% endif %}>Member</option>
+                    <option value="team_lead" {% if form.role.value == 'team_lead' %}selected{% endif %}>Team Lead</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="id_avatar" class="form-label">Avatar</label>
+                <input type="file" name="avatar" id="id_avatar" class="form-control" accept="image/*">
+                {% if user.profile.avatar %}<p class="small text-muted mt-1">Current: <a href="{{ user.profile.avatar.url }}">{{ user.profile.avatar.name }}</a></p>{% endif %}
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "core/base.html" %}
+{% block title %}Teams – Teamflow{% endblock %}
+{% block content %}
+<h1>Teams</h1>
+{% if user.profile.role == 'team_lead' %}
+<p><a href="{% url 'core:team_create' %}" class="btn">Create team</a></p>
+{% endif %}
+{% if teams %}
+<ul>
+    {% for team in teams %}
+    <li><a href="{% url 'core:team_detail' team.pk %}">{{ team.name }}</a> – {{ team.members.count }} member(s)</li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No teams yet.</p>
+{% endif %}
+{% endblock %}

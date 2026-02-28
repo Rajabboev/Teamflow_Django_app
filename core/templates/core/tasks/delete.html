@@ -1,0 +1,15 @@
+{% extends "core/base.html" %}
+{% block title %}Delete task – Teamflow{% endblock %}
+{% block content %}
+<div class="card border-danger shadow-sm">
+    <div class="card-body">
+        <h2 class="h5 card-title text-danger">Delete task</h2>
+        <p>Are you sure you want to delete <strong>{{ task.title }}</strong>? This action cannot be undone.</p>
+        <form method="post" action="">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Delete</button>
+            <a href="{% url 'core:task_detail' task.pk %}" class="btn btn-outline-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

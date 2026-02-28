@@ -1,0 +1,29 @@
+{% extends "core/base.html" %}
+{% block title %}Create team – Teamflow{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'core:team_list' %}">Teams</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Create</li>
+    </ol>
+</nav>
+<h1 class="h3 mb-4">Create team</h1>
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form method="post" action="">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="id_name" class="form-label">Name</label>
+                <input type="text" name="name" id="id_name" class="form-control" maxlength="255" required value="{{ form.name.value|default:'' }}">
+                {% if form.name.errors %}<div class="invalid-feedback d-block">{{ form.name.errors.0 }}</div>{% endif %}
+            </div>
+            <div class="mb-3">
+                <label for="id_description" class="form-label">Description</label>
+                <textarea name="description" id="id_description" class="form-control" rows="3">{{ form.description.value|default:'' }}</textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Create team</button>
+            <a href="{% url 'core:team_list' %}" class="btn btn-outline-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

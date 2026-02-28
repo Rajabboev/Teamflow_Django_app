@@ -1,0 +1,11 @@
+{% extends "core/base.html" %}
+{% block title %}Add feedback – {{ task.title }}{% endblock %}
+{% block content %}
+<h1>Add feedback for: {{ task.title }}</h1>
+<form method="post" action="">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <p><button type="submit" class="btn">Submit feedback</button></p>
+</form>
+<p><a href="{% url 'core:task_detail' task.pk %}">Back to task</a></p>
+{% endblock %}

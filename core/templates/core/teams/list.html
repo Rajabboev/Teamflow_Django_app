@@ -1,0 +1,28 @@
+{% extends "core/base.html" %}
+{% block title %}Teams – Teamflow{% endblock %}
+{% block content %}
+<h1 class="h3 mb-4">Teams</h1>
+{% if user.profile.role == 'team_lead' %}
+<p><a href="{% url 'core:team_create' %}" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Create team</a></p>
+{% endif %}
+{% if teams %}
+<div class="row g-3">
+    {% for team in teams %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title"><a href="{% url 'core:team_detail' team.pk %}" class="text-decoration-none">{{ team.name }}</a></h5>
+                <p class="card-text text-muted small">{{ team.description|truncatewords:15|default:"No description." }}</p>
+                <p class="mb-0 small"><i class="bi bi-people"></i> {{ team.members.count }} member(s)</p>
+            </div>
+            <div class="card-footer bg-transparent">
+                <a href="{% url 'core:team_detail' team.pk %}" class="btn btn-sm btn-outline-primary">View</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p class="text-muted">No teams yet.</p>
+{% endif %}
+{% endblock %}

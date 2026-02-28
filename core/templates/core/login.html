@@ -1,0 +1,11 @@
+{% extends "core/base.html" %}
+{% block title %}Login – Teamflow{% endblock %}
+{% block content %}
+<h1>Log in</h1>
+<form method="post" action="{% url 'core:login' %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <p><button type="submit" class="btn">Log in</button></p>
+</form>
+<p>No account? <a href="{% url 'core:register' %}">Register</a></p>
+{% endblock %}

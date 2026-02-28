@@ -1,0 +1,61 @@
+services:
+  db:
+    image: postgres:15-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-postgres}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-teamflow}
+      POSTGRES_USER: ${POSTGRES_USER:-teamflow_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    networks:
+      - teamflow_network
+
+  web:
+    image: teamflow:prod
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+      - static_files:/app/staticfiles
+      - media_files:/app/media
+    ports:
+      - "8000:8000"
+    env_file: .env
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-teamflow}
+      DB_USER: ${DB_USER:-teamflow_user}
+      DB_PASSWORD: ${DB_PASSWORD}
+      SECRET_KEY: ${SECRET_KEY:-dev-secret-key}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1}
+      DEBUG: "True"
+      SECURE_SSL_REDIRECT: "False"
+      DJANGO_SUPERUSER_USERNAME: ${DJANGO_SUPERUSER_USERNAME:-}
+      DJANGO_SUPERUSER_EMAIL: ${DJANGO_SUPERUSER_EMAIL:-}
+      DJANGO_SUPERUSER_PASSWORD: ${DJANGO_SUPERUSER_PASSWORD:-}
+    command: ["gunicorn", "teamflow.wsgi:application", "--workers", "1", "--timeout", "120", "--bind", "0.0.0.0:8000", "--reload"]
+    restart: unless-stopped
+    networks:
+      - teamflow_network
+
+volumes:
+  postgres_data:
+  static_files:
+  media_files:
+
+networks:
+  teamflow_network:
+    driver: bridge

@@ -1,0 +1,35 @@
+{% extends "core/base.html" %}
+{% block title %}{{ team.name }} – Teamflow{% endblock %}
+{% block content %}
+<h1>{{ team.name }}</h1>
+<p>{{ team.description|default:"No description." }}</p>
+<p>Created by {{ team.created_by.get_username }} on {{ team.created_at|date }}</p>
+
+<h2>Members</h2>
+<ul>
+    {% for m in team.members.all %}
+    <li>
+        {{ m.get_username }}
+        {% if is_lead %}
+        <form method="post" action="{% url 'core:team_remove_member' team.pk m.id %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger" style="padding:0.2rem 0.5rem;font-size:0.85rem;">Remove</button>
+        </form>
+        {% endif %}
+    </li>
+    {% empty %}
+    <li>No members yet.</li>
+    {% endfor %}
+</ul>
+
+{% if is_lead %}
+<h3>Add member</h3>
+<form method="post" action="{% url 'core:team_add_member' team.pk %}">
+    {% csrf_token %}
+    <p><label>Username</label> <input type="text" name="username" placeholder="Username" required></p>
+    <p><button type="submit" class="btn">Add</button></p>
+</form>
+{% endif %}
+
+<p><a href="{% url 'core:team_list' %}" class="btn">Back to teams</a></p>
+{% endblock %}

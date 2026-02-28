@@ -1,0 +1,53 @@
+/* Teamflow custom styles */
+:root {
+    --status-todo: #6c757d;
+    --status-in-progress: #0d6efd;
+    --status-done: #198754;
+    --priority-low: #198754;
+    --priority-medium: #ffc107;
+    --priority-high: #dc3545;
+}
+
+.sidebar {
+    min-height: calc(100vh - 56px);
+    box-shadow: 1px 0 3px rgba(0,0,0,.08);
+}
+
+.sidebar .nav-link {
+    border-radius: 0.25rem;
+    margin: 0 0.5rem;
+}
+.sidebar .nav-link:hover {
+    background-color: rgba(0,0,0,.05);
+}
+
+.badge-status-todo { background-color: var(--status-todo); }
+.badge-status-in_progress { background-color: var(--status-in-progress); }
+.badge-status-done { background-color: var(--status-done); }
+
+.badge-priority-low { background-color: var(--priority-low); }
+.badge-priority-medium { background-color: var(--priority-medium); color: #212529; }
+.badge-priority-high { background-color: var(--priority-high); }
+
+.task-row-overdue {
+    background-color: rgba(220, 53, 69, 0.08);
+    border-left: 3px solid #dc3545;
+}
+
+.card-stat {
+    transition: transform 0.15s ease;
+}
+.card-stat:hover {
+    transform: translateY(-2px);
+}
+
+.countdown-overdue {
+    color: #dc3545;
+    font-weight: 600;
+}
+
+@media (max-width: 767.98px) {
+    .sidebar {
+        min-height: auto;
+    }
+}

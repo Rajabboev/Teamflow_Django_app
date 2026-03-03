@@ -123,12 +123,8 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Export image digest
-        id: digest
-        run: echo "IMAGE_DIGEST=${{ steps.build-and-push.outputs.digest }}" >> $GITHUB_OUTPUT
-
   deploy:
-    name: Deploy to Server
+    name: Deploy to Google Cloud VM
     runs-on: ubuntu-latest
     needs: build
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -148,30 +144,19 @@ jobs:
             echo "Pulling latest web image..."
             docker compose pull web
 
-            echo "Running migrations (one-off)..."
+            echo "Running migrations..."
             docker compose run --rm web python manage.py migrate --noinput
 
-            echo "Collecting static files (one-off)..."
+            echo "Collecting static files..."
             docker compose run --rm web python manage.py collectstatic --noinput
 
-            echo "Rolling update (scale web=2)..."
-            docker compose up -d --no-deps --scale web=2 web
-            sleep 20
-
-            echo "Switch back to normal scale..."
+            echo "Restarting web and nginx..."
             docker compose up -d --no-deps web
+            docker compose restart nginx
 
             echo "Pruning unused Docker images..."
             docker image prune -f
 
-      - name: Health check
+      - name: Health check (HTTP by IP)
         run: |
-          curl -f https://yourdomain.uz/health/ || (echo "Health check failed" && exit 1)
-
-      - name: Deployment success notification
-        if: success()
-        run: echo "Deployment succeeded for $GITHUB_SHA"
-
-      - name: Deployment failure notification
-        if: failure()
-        run: echo "Deployment failed for $GITHUB_SHA"
+          curl -f http://${{ secrets.SSH_HOST }}/ || (echo "Health check failed" && exit 1)

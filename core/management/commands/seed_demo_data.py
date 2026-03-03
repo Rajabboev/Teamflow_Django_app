@@ -6,12 +6,13 @@ from django.utils import timezone
 
 from core.models import Profile, Team, Tag, Task, Feedback
 
-
 User = get_user_model()
 
 
 class Command(BaseCommand):
-    help = "Seed the database with demo data for Teamflow (users, teams, tasks, feedback)."
+    help = (
+        "Seed the database with demo data for Teamflow (users, teams, tasks, feedback)."
+    )
 
     def handle(self, *args, **options):
         self.stdout.write("Seeding demo data...")

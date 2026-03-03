@@ -6,7 +6,6 @@ from django.utils import timezone
 
 from core.models import Profile, Task
 
-
 User = get_user_model()
 
 

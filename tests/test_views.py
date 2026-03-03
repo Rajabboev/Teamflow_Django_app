@@ -7,7 +7,6 @@ from django.utils import timezone
 
 from core.models import Task, Feedback
 
-
 User = get_user_model()
 
 
@@ -142,4 +141,3 @@ def test_task_list_filters_by_status(client, member_user, team_lead_user, team):
     tasks = list(response.context["tasks"])
     assert done_task in tasks
     assert todo_task not in tasks
-

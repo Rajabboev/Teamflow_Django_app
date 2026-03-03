@@ -141,8 +141,11 @@ jobs:
             set -e
             cd /opt/teamflow
 
-            echo "Pulling latest web image..."
+            echo "Pulling latest images..."
             docker compose pull web
+
+            echo "Starting web first..."
+            docker compose up -d --no-deps web
 
             echo "Running migrations..."
             docker compose run --rm web python manage.py migrate --noinput
@@ -150,14 +153,13 @@ jobs:
             echo "Collecting static files..."
             docker compose run --rm web python manage.py collectstatic --noinput
 
-            echo "Restarting web and nginx..."
-            docker compose up -d --no-deps web
+            echo "Restarting nginx..."
             docker compose restart nginx
 
             echo "Pruning unused Docker images..."
             docker image prune -f
 
-      - name: Health check (retry)
+      - name: Health check (retry /health)
         run: |
           for i in {1..30}; do
             if curl -fsS http://${{ secrets.SSH_HOST }}/health/ > /dev/null; then

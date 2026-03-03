@@ -18,8 +18,8 @@ CSRF_COOKIE_SECURE = True
 
 # Static and media (WhiteNoise serves static; media usually from CDN or separate storage)
 STATIC_URL = config('STATIC_URL', default='/static/')
-STATIC_ROOT = BASE_DIR / config('STATIC_ROOT', default='staticfiles')
+STATIC_ROOT = BASE_DIR / config('STATIC_ROOT', default='staticfiles')  # noqa: F405
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = config('MEDIA_URL', default='/media/')
-MEDIA_ROOT = BASE_DIR / config('MEDIA_ROOT', default='media')
+MEDIA_ROOT = BASE_DIR / config('MEDIA_ROOT', default='media')  # noqa: F405

@@ -223,10 +223,10 @@ class TaskListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         qs = Task.objects.filter(
-            Q(assigned_to=self.request.user) |
-            Q(team__members=self.request.user) |
-            Q(team__created_by=self.request.user)
-        ).distinct().select_related('team', 'assigned_to', 'created_by').prefetch_related('tags')
+            Q(assigned_to=self.request.user)
+            | Q(team__members=self.request.user)
+            | Q(team__created_by=self.request.user)
+        ).distinct().select_related("team", "assigned_to", "created_by").prefetch_related("tags")
         status = self.request.GET.get('status')
         if status:
             qs = qs.filter(status=status)
@@ -256,10 +256,10 @@ class TaskDetailView(LoginRequiredMixin, DetailView):
 
     def get_queryset(self):
         return Task.objects.filter(
-            Q(assigned_to=self.request.user) |
-            Q(team__members=self.request.user) |
-            Q(team__created_by=self.request.user)
-        ).distinct().prefetch_related('feedbacks', 'feedbacks__author', 'tags')
+            Q(assigned_to=self.request.user)
+            | Q(team__members=self.request.user)
+            | Q(team__created_by=self.request.user)
+        ).distinct().prefetch_related("feedbacks", "feedbacks__author", "tags")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -318,9 +318,9 @@ class TaskUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
 
     def get_queryset(self):
         return Task.objects.filter(
-            Q(assigned_to=self.request.user) |
-            Q(team__members=self.request.user) |
-            Q(team__created_by=self.request.user)
+            Q(assigned_to=self.request.user)
+            | Q(team__members=self.request.user)
+            | Q(team__created_by=self.request.user)
         ).distinct()
 
 
@@ -332,9 +332,9 @@ class TaskDeleteView(LoginRequiredMixin, DeleteView):
 
     def get_queryset(self):
         return Task.objects.filter(
-            Q(assigned_to=self.request.user) |
-            Q(team__members=self.request.user) |
-            Q(team__created_by=self.request.user)
+            Q(assigned_to=self.request.user)
+            | Q(team__members=self.request.user)
+            | Q(team__created_by=self.request.user)
         ).distinct()
 
 
@@ -349,9 +349,9 @@ class FeedbackCreateView(TeamLeadRequiredMixin, LoginRequiredMixin, SuccessMessa
     def get_task(self):
         return get_object_or_404(
             Task.objects.filter(
-                Q(assigned_to=self.request.user) |
-                Q(team__members=self.request.user) |
-                Q(team__created_by=self.request.user)
+                Q(assigned_to=self.request.user)
+                | Q(team__members=self.request.user)
+                | Q(team__created_by=self.request.user)
             ).distinct(),
             pk=self.kwargs['task_pk'],
         )

@@ -68,4 +68,3 @@ def task(db, team, team_lead_user, member_user):
         priority="medium",
         deadline=timezone.now() + timedelta(days=1),
     )
-

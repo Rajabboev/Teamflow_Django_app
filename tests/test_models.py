@@ -46,4 +46,3 @@ def test_team_member_count(team, team_lead_user, member_user):
     assert team.members.count() == 2
     usernames = set(team.members.values_list("username", flat=True))
     assert {"lead", "member"} <= usernames
-

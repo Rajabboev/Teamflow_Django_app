@@ -159,4 +159,4 @@ jobs:
 
       - name: Health check (HTTP by IP)
         run: |
-          curl -f http://${{ secrets.SSH_HOST }}/ || (echo "Health check failed" && exit 1)
+          curl -fsSL http://${{ secrets.SSH_HOST }}/ || (echo "Health check failed" && exit 1)

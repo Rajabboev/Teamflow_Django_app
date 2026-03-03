@@ -157,6 +157,15 @@ jobs:
             echo "Pruning unused Docker images..."
             docker image prune -f
 
-      - name: Health check (HTTP by IP)
+      - name: Health check (retry)
         run: |
-          curl -fsSL http://${{ secrets.SSH_HOST }}/ || (echo "Health check failed" && exit 1)
+          for i in {1..30}; do
+            if curl -fsS http://${{ secrets.SSH_HOST }}/health/ > /dev/null; then
+              echo "Health check OK"
+              exit 0
+            fi
+            echo "Waiting for app... ($i/30)"
+            sleep 2
+          done
+          echo "Health check failed"
+          exit 1

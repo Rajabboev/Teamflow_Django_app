@@ -4,7 +4,7 @@ Imports base and overrides for production (DEBUG=False, security, static/media).
 """
 from decouple import config, Csv
 
-from .base import *
+from .base import *  # noqa: F401,F403
 
 DEBUG = False
 

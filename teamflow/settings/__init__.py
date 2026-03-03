@@ -1,2 +1,2 @@
-# Default to base settings; set DJANGO_SETTINGS_MODULE=teamflow.settings.production for production
-from .base import *
+# Default to base settings; re-export base for Django entrypoints.
+from .base import *  # noqa: F401,F403

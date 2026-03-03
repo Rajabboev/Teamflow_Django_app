@@ -22,7 +22,7 @@ services:
       - teamflow_network
 
   web:
-    image: teamflow:prod
+    image: admin1208/teamflow:latest
     depends_on:
       db:
         condition: service_healthy

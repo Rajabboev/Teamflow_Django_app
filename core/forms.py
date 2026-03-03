@@ -7,6 +7,32 @@ from .models import Profile, Team, Task, Feedback, Tag
 User = get_user_model()
 
 
+class AddMemberForm(forms.Form):
+    """Form for team leads to create a new user (new hire) and optionally add to teams."""
+    username = forms.CharField(max_length=150)
+    email = forms.EmailField()
+    password1 = forms.CharField(widget=forms.PasswordInput, label='Password')
+    password2 = forms.CharField(widget=forms.PasswordInput, label='Confirm password')
+    role = forms.ChoiceField(choices=Profile.ROLE_CHOICES, initial='member')
+    teams = forms.ModelMultipleChoiceField(
+        queryset=Team.objects.none(),
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+    )
+
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if username and User.objects.filter(username=username).exists():
+            raise forms.ValidationError('A user with this username already exists.')
+        return username
+
+    def clean(self):
+        data = super().clean()
+        if data.get('password1') != data.get('password2'):
+            raise forms.ValidationError({'password2': 'Passwords do not match.'})
+        return data
+
+
 class RegisterForm(UserCreationForm):
     email = forms.EmailField(required=True)
     role = forms.ChoiceField(choices=Profile.ROLE_CHOICES, initial='member')

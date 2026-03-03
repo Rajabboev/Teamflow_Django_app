@@ -10,12 +10,21 @@ from django.views.generic import (
     CreateView,
     DeleteView,
     DetailView,
+    FormView,
     ListView,
     UpdateView,
     TemplateView,
 )
 
-from .forms import RegisterForm, ProfileForm, TeamForm, TaskForm, TaskStatusOnlyForm, FeedbackForm
+from .forms import (
+    RegisterForm,
+    ProfileForm,
+    TeamForm,
+    TaskForm,
+    TaskStatusOnlyForm,
+    FeedbackForm,
+    AddMemberForm,
+)
 from .models import Profile, Team, Task, Feedback
 
 User = get_user_model()
@@ -107,6 +116,42 @@ class TeamListView(LoginRequiredMixin, ListView):
         return Team.objects.filter(
             Q(created_by=user) | Q(members=user)
         ).distinct()
+
+
+class AddMemberView(TeamLeadRequiredMixin, SuccessMessageMixin, FormView):
+    """Team leads only: create a new user (new hire) and optionally add to teams."""
+    form_class = AddMemberForm
+    template_name = 'core/members/add.html'
+    success_url = reverse_lazy('core:team_list')
+    success_message = 'New member added successfully.'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        user = self.request.user
+        kwargs['teams_queryset'] = Team.objects.filter(
+            Q(created_by=user) | Q(members=user)
+        ).distinct()
+        return kwargs
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        qs = self.get_form_kwargs().get('teams_queryset', Team.objects.none())
+        form.fields['teams'].queryset = qs
+        return form
+
+    def form_valid(self, form):
+        user = User.objects.create_user(
+            username=form.cleaned_data['username'],
+            email=form.cleaned_data['email'],
+            password=form.cleaned_data['password1'],
+        )
+        Profile.objects.update_or_create(
+            user=user,
+            defaults={'role': form.cleaned_data['role']},
+        )
+        for team in form.cleaned_data.get('teams') or []:
+            team.members.add(user)
+        return super().form_valid(form)
 
 
 class TeamCreateView(TeamLeadRequiredMixin, SuccessMessageMixin, CreateView):

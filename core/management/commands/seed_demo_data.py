@@ -160,4 +160,3 @@ class Command(BaseCommand):
         )
 
         self.stdout.write(self.style.SUCCESS("Demo data seeded successfully."))
-        

@@ -33,7 +33,9 @@
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                                 <li><a class="dropdown-item" href="{% url 'core:profile' %}">Profile</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{% url 'core:logout' %}">Logout</a></li>
+                                <li><form method="post" action="{% url 'core:logout' %}">{% csrf_token %}
+                                <button type="submit" class="dropdown-item">Logout</button>
+                                </form></li>
                             </ul>
                         </li>
                     {% else %}
@@ -56,7 +58,7 @@
                         <li class="nav-item"><a class="nav-link link-dark" href="{% url 'core:task_list' %}"><i class="bi bi-list-task"></i> Tasks</a></li>
                         {% if user.profile.role == 'team_lead' %}
                         <li class="nav-item"><a class="nav-link link-dark" href="{% url 'core:team_create' %}"><i class="bi bi-plus-circle"></i> New team</a></li>
-                        <li class="nav-item"><a class="nav-link link-dark" href="{% url 'core:add_member' %}"><i class="bi bi-person-plus"></i> Add member</a></li>
+
                         <li class="nav-item"><a class="nav-link link-dark" href="{% url 'core:task_create' %}"><i class="bi bi-plus-square"></i> New task</a></li>
                         {% endif %}
                         <li class="nav-item"><a class="nav-link link-dark" href="{% url 'core:profile' %}"><i class="bi bi-person"></i> Profile</a></li>
